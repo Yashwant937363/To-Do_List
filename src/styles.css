@@ -1,0 +1,17 @@
+* {
+  font-family: sans-serif;
+  padding: 0px;
+  margin: 0px;
+}
+body {
+  color: wheat;
+  background-image: url("https://w0.peakpx.com/wallpaper/998/17/HD-wallpaper-green-theme-background-whatsapp-thumbnail.jpg");
+}
+.navbar {
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+.navbar li {
+  padding: 10px;
+}
