@@ -17,7 +17,7 @@ const About = () => {
   const headingStyle = {
     fontSize: '24px',
     marginBottom: '10px',
-    color: 'wheat',
+    color: 'orange',
   };
 
   const paragraphStyle = {

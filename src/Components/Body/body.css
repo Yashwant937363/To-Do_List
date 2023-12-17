@@ -1,0 +1,19 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 50px 20px;
+}
+
+.header h1 {
+    display: inline;
+}
+
+.header .btn {
+    border-radius: 23px;
+    background-color: var(--first);
+    padding: 7px 15px;
+    font-size: 1.05rem;
+    border: 0px;
+    color: white;
+}
