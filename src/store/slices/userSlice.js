@@ -2,8 +2,13 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getNotes } from './notesSlice';
 import Cookies from 'js-cookie';
 
+
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+// const SERVER_URL = "http://localhost:5000";
+const constructApiUrl = (endpoint) => `${SERVER_URL}/api/auth/${endpoint}`;
+
 export const signupUser = createAsyncThunk('signupUser', async ({ username, email, password, dispatch }) => {
-   const response = await fetch('/api/auth/', {
+   const response = await fetch(constructApiUrl(''), {
       method: 'POST',
       headers: {
          'Content-Type': 'application/json',
@@ -16,7 +21,7 @@ export const signupUser = createAsyncThunk('signupUser', async ({ username, emai
       }),
    });
    const data = await response.json();
-   if(response.ok){
+   if (response.ok) {
       dispatch(getNotes(data.authtoken));
    }
    return {
@@ -26,7 +31,7 @@ export const signupUser = createAsyncThunk('signupUser', async ({ username, emai
 });
 
 export const loginUser = createAsyncThunk('loginUser', async ({ email, password, dispatch }) => {
-   const response = await fetch('/api/auth/login', {
+   const response = await fetch(constructApiUrl('login'), {
       method: 'POST',
       headers: {
          'Content-Type': 'application/json',
@@ -47,7 +52,7 @@ export const loginUser = createAsyncThunk('loginUser', async ({ email, password,
 })
 
 export const getUser = createAsyncThunk('getUser', async ({ token, dispatch }) => {
-   const response = await fetch('/api/auth/', {
+   const response = await fetch(constructApiUrl(''), {
       method: 'GET',
       headers: {
          'Accept': '*/*',
@@ -100,6 +105,8 @@ export const userSlice = createSlice({
          state.authtoken = null;
          state.email = null;
          state.username = null;
+         state.successmsg = '';
+         state.errormsg = '';
       },
    },
    extraReducers: (builder) => {
@@ -123,8 +130,8 @@ export const userSlice = createSlice({
       })
       builder.addCase(loginUser.rejected, (state, action) => {
          state.isPending = false;
-         console.log(action.error);
-      })
+         state.errormsg = "Login failed. Please check your credentials and try again.";
+      });
 
       //Case 2 : SignUp User
       builder.addCase(signupUser.pending, (state, action) => {
@@ -137,16 +144,15 @@ export const userSlice = createSlice({
             state.successmsg = "Sign Up Successful";
             Cookies.set('authtoken', action.payload.data.authtoken, { expires: 7 });
          }
-         else{
+         else {
             state.errormsg = action.payload.data.errors[0]?.msg;
-            console.log(action.payload.data.errors[0]?.msg);
          }
          state.isPending = false;
       })
       builder.addCase(signupUser.rejected, (state, action) => {
          state.isPending = false;
-         console.log(action.payload);
-      })
+         state.errormsg = "Sign Up failed. Please try again.";
+      });
 
       //Case 3 : Get User
       builder.addCase(getUser.pending, (state, action) => {
@@ -161,8 +167,8 @@ export const userSlice = createSlice({
       })
       builder.addCase(getUser.rejected, (state, action) => {
          state.isPending = false;
-         console.log(action.payload);
-      })
+         state.errormsg = "Failed to fetch user data. Please try again.";
+      });
    }
 })
 

@@ -1,7 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+
+const constructApiUrl = (endpoint) => `${SERVER_URL}/api/notes/${endpoint}`;
+
 export const getNotes = createAsyncThunk('getNotes', async (authtoken) => {
-    const response = await fetch('/api/notes', {
+    const response = await fetch(constructApiUrl(''), {
         method: 'GET',
         headers: {
             'auth-token': authtoken,
@@ -26,7 +30,7 @@ export const getNotes = createAsyncThunk('getNotes', async (authtoken) => {
 });
 
 export const createNote = createAsyncThunk('createNote', async ({ authtoken, newNote, dispatch, setNoteOpen }) => {
-    const response = await fetch('/api/notes', {
+    const response = await fetch(constructApiUrl(''), {
         method: 'POST',
         headers: {
             'auth-token': authtoken,
@@ -36,10 +40,7 @@ export const createNote = createAsyncThunk('createNote', async ({ authtoken, new
         body: newNote,
     })
     try {
-        console.log('response : ' + response)
         const data = await response.json();
-        console.log(`Data:`, data);
-        console.log(`Status Code:`, response.status);
         if (response.ok) {
             dispatch(getNotes(authtoken));
             setNoteOpen(false);
@@ -55,7 +56,7 @@ export const createNote = createAsyncThunk('createNote', async ({ authtoken, new
 });
 
 export const updateNote = createAsyncThunk('updateNote', async ({ authtoken, newNote, dispatch, id, setNoteOpen }) => {
-    const response = await fetch(`/api/notes/${id}`, {
+    const response = await fetch(constructApiUrl(id), {
         method: 'PUT',
         headers: {
             'auth-token': authtoken,
@@ -81,7 +82,7 @@ export const updateNote = createAsyncThunk('updateNote', async ({ authtoken, new
 });
 
 export const deleteNote = createAsyncThunk('deleteNote', async ({ authtoken, dispatch, id }) => {
-    const response = await fetch(`/api/notes/${id}`, {
+    const response = await fetch(constructApiUrl(id), {
         method: 'DELETE',
         headers: {
             'auth-token': authtoken,
@@ -92,10 +93,7 @@ export const deleteNote = createAsyncThunk('deleteNote', async ({ authtoken, dis
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        console.log('response : ' + response)
         const data = await response.json();
-        console.log(`Data:`, data);
-        console.log(`Status Code:`, response.status);
         if (response.ok) {
             dispatch(getNotes(authtoken));
         }
@@ -142,6 +140,7 @@ const notesSlice = createSlice({
         });
         builder.addCase(getNotes.rejected, (state, action) => {
             state.isPending = false;
+            state.errormsg = 'Get Notes Failed';
         });
 
         //Case 2 : Create a New Note
@@ -159,7 +158,7 @@ const notesSlice = createSlice({
         });
         builder.addCase(createNote.rejected, (state, action) => {
             state.isPending = false;
-            console.log(action.payload);
+            state.errormsg = 'Create Note Failed! Please reload page';
         });
 
         //Case 3 : Update Note
@@ -168,7 +167,7 @@ const notesSlice = createSlice({
         });
         builder.addCase(updateNote.fulfilled, (state, action) => {
             if (action.payload.status < 300 && action.payload.status >= 200) {
-                state.successmsg = 'Note Updated Successfully';
+                state.successmsg = 'Note Updated Successfully! Please try again';
             }
             else {
                 state.errormsg = action.payload.data?.errors[0].msg;
@@ -177,6 +176,7 @@ const notesSlice = createSlice({
         });
         builder.addCase(updateNote.rejected, (state, action) => {
             state.isPending = false;
+            state.errormsg = 'Update Note Failed! Please try again';
         });
 
         //Case 4 : Delete Note
@@ -192,6 +192,7 @@ const notesSlice = createSlice({
         });
         builder.addCase(deleteNote.rejected, (state, action) => {
             state.isPending = false;
+            state.errormsg = 'Delete Note Failed! Please try again';
         });
     }
 })

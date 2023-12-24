@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './NoteWindow.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { createNote, deleteNote, updateNote } from '../../../store/slices/notesSlice';
+import { createNote, deleteNote, setErrorMsg, updateNote } from '../../../store/slices/notesSlice';
 
 export default function NoteWindow(props) {
     const dispatch = useDispatch();
@@ -16,20 +16,34 @@ export default function NoteWindow(props) {
     }
 
     const handleSave = () => {
+        // Validation checks
+        if (!title.trim()) {
+            dispatch(setErrorMsg('Title cannot be empty'));
+            return;
+        }
+
+        if (body.length < 5) {
+            dispatch(setErrorMsg('Textarea must have at least 5 letters'));
+            return;
+        }
+
+        if (tag === 'Default') {
+            dispatch(setErrorMsg('Please select a tag'));
+            return;
+        }
+
         if (newNote) {
-            console.log('create new note ');
             let newNote = JSON.stringify({
                 title, tag, body
             });
             dispatch(createNote({ authtoken, newNote, dispatch, setNoteOpen }));
         }
         else {
-            console.log("update existing note")
             let id = note._id;
             let newNote = JSON.stringify({
                 title, tag, body
             })
-            dispatch(updateNote({ authtoken, newNote, dispatch, id ,setNoteOpen}));
+            dispatch(updateNote({ authtoken, newNote, dispatch, id, setNoteOpen }));
         }
     }
 
@@ -38,6 +52,29 @@ export default function NoteWindow(props) {
         dispatch(deleteNote({ authtoken, dispatch, id }));
         setNoteOpen(false);
     }
+    const tagOptions = [
+        "Select a Tag",
+        "Coffee Shop",
+        "Evening Relaxation",
+        "General",
+        "Home",
+        "Home Office",
+        "Idea",
+        "Journal",
+        "Library",
+        "Meeting",
+        "Morning Routine",
+        "Office",
+        "Personal",
+        "Project",
+        "Reminder",
+        "School",
+        "Shopping",
+        "Study",
+        "Task",
+        "Work",
+    ];
+
     return (
         <div className='window'>
             <div className='windowheader'>
@@ -50,26 +87,11 @@ export default function NoteWindow(props) {
             <form className='noteform'>
                 <input type='text' value={title} onChange={(e) => setTitie(e.target.value)} placeholder='Title'></input>
                 <select id="noteTags" value={tag} onChange={handleChangeTag} name="noteTags">
-                    <option value="Default">Select a Tag</option>
-                    <option value="Coffee Shop">Coffee Shop</option>
-                    <option value="Evening Relaxation">Evening Relaxation</option>
-                    <option value="General">General</option>
-                    <option value="Home">Home</option>
-                    <option value="Home Office">Home Office</option>
-                    <option value="Idea">Idea</option>
-                    <option value="Journal">Journal</option>
-                    <option value="Library">Library</option>
-                    <option value="Meeting">Meeting</option>
-                    <option value="Morning Routine">Morning Routine</option>
-                    <option value="Office">Office</option>
-                    <option value="Personal">Personal</option>
-                    <option value="Project">Project</option>
-                    <option value="Reminder">Reminder</option>
-                    <option value="School">School</option>
-                    <option value="Shopping">Shopping</option>
-                    <option value="Study">Study</option>
-                    <option value="Task">Task</option>
-                    <option value="Work">Work</option>
+                    {tagOptions.map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
                 </select>
                 <textarea value={body} onChange={(e) => setBody(e.target.value)}></textarea>
             </form>
