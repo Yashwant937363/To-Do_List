@@ -13,7 +13,7 @@ import {
 import { motion } from "motion/react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import DiscardNoteDialog from "./DiscardNoteDialog";
-import type NoteForm from "../../types/NoteForm";
+import { type NoteForm } from "../../types/NoteForm";
 
 const tagOptions = [
   "General",

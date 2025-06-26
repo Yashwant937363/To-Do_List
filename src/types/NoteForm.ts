@@ -1,4 +1,4 @@
-export default interface NoteForm {
+export interface NoteForm {
   title: string;
   body: string;
   tag: string;

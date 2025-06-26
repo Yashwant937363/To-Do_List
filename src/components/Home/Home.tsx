@@ -20,7 +20,7 @@ const Home: React.FC = () => {
     }
   }, []);
   return (
-    <div>
+    <div className="">
       {openedNotePurpose !== "" && <NoteDialog purpose={openedNotePurpose} />}
       <div className="m-10 flex justify-between">
         <h1 className="text-xl">Welcome {username}</h1>

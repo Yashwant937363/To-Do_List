@@ -1,6 +1,6 @@
 import React, { type MouseEventHandler } from "react";
 import type { FieldErrors } from "react-hook-form";
-import type { NoteForm } from "./NoteDialog";
+import { type NoteForm } from "../../types/NoteForm";
 
 interface DiscardNoteDialogProps {
   discard: boolean;
