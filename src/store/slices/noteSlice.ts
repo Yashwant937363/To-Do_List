@@ -15,14 +15,14 @@ const constructApiUrl = (endpoint: string): string =>
 export const getNotes = createAsyncThunk(
   "getNotes",
   async (authtoken: string) => {
-    const response = await axios.get(constructApiUrl(""), {
-      headers: { "auth-token": authtoken },
+    const response = await axios.get(constructApiUrl("all"), {
+      headers: { Authorization: `Bearer ${authtoken}` },
     });
 
     return {
-      data: response.data,
+      data: response.data.data,
     };
-  }
+  },
 );
 
 interface createNoteRequest {
@@ -34,12 +34,12 @@ export const createNote = createAsyncThunk(
   "createNote",
   async ({ authtoken, newNote }: createNoteRequest) => {
     const response = await axios.post(constructApiUrl(""), newNote, {
-      headers: { "auth-token": authtoken },
+      headers: { Authorization: `Bearer ${authtoken}` },
     });
     return {
       data: response.data,
     };
-  }
+  },
 );
 
 interface updateNoteRequest {
@@ -52,15 +52,15 @@ interface updateNoteRequest {
 export const updateNote = createAsyncThunk(
   "updateNote",
   async ({ authtoken, newNote, id }: updateNoteRequest) => {
-    const response = await axios.put(constructApiUrl(id), newNote, {
-      headers: { "auth-token": authtoken },
+    const response = await axios.patch(constructApiUrl(id), newNote, {
+      headers: { Authorization: `Bearer ${authtoken}` },
     });
 
     return {
-      data: response.data,
+      data: response.data.data,
       status: response.status,
     };
-  }
+  },
 );
 
 interface deleteNoteRequest {
@@ -73,14 +73,14 @@ export const deleteNote = createAsyncThunk(
   "deleteNote",
   async ({ authtoken, id }: deleteNoteRequest) => {
     const response = await axios.delete(constructApiUrl(id), {
-      headers: { "auth-token": authtoken },
+      headers: { Authorization: `Bearer ${authtoken}` },
     });
 
     return {
-      data: response.data,
+      data: response.data.data,
       status: response.status === 200,
     };
-  }
+  },
 );
 
 interface noteState {
@@ -115,7 +115,7 @@ const noteSlice = createSlice({
       action: PayloadAction<{
         purpose: Purpose;
         id?: string;
-      }>
+      }>,
     ) => {
       const { purpose, id } = action.payload;
       state.isNoteOpen = true;
@@ -176,7 +176,7 @@ const noteSlice = createSlice({
     builder.addCase(updateNote.fulfilled, (state, action) => {
       const updatedNote: Note = action.payload.data.note;
       const nonUpdatedNotes = state.notes.filter(
-        (note) => note.id !== updatedNote.id
+        (note) => note.id !== updatedNote.id,
       );
       state.notes = [...nonUpdatedNotes, updatedNote];
       state.isPending = false;
@@ -195,7 +195,7 @@ const noteSlice = createSlice({
     builder.addCase(deleteNote.fulfilled, (state) => {
       let notes = state.notes;
       let remainingNotes = notes.filter(
-        (note) => note.id !== state.deleleNoteId
+        (note) => note.id !== state.deleleNoteId,
       );
       state.notes = remainingNotes;
       state.deleleNoteId = "";

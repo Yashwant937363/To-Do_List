@@ -39,7 +39,7 @@ interface NoteDialogProps {
 
 const NoteDialog: React.FC<NoteDialogProps> = ({ purpose }) => {
   const { isNoteOpen, notes, openedNoteID } = useAppSelector(
-    (state) => state.notes
+    (state) => state.notes,
   );
   const { authtoken } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -79,7 +79,7 @@ const NoteDialog: React.FC<NoteDialogProps> = ({ purpose }) => {
         createNote({
           authtoken,
           newNote: { body: data.body, title: data.title, tag: data.tag },
-        })
+        }),
       );
     }
     if (purpose === "edit") {
@@ -95,7 +95,7 @@ const NoteDialog: React.FC<NoteDialogProps> = ({ purpose }) => {
               authtoken,
               id: openedNoteID,
               newNote: { body: data.body, title: data.title, tag: data.tag },
-            })
+            }),
           );
         } else {
           dispatch(closeNote());
@@ -132,7 +132,7 @@ const NoteDialog: React.FC<NoteDialogProps> = ({ purpose }) => {
     if (purpose === "edit" || purpose === "show") {
       const note = notes.find((note) => note.id === openedNoteID);
       if (note) {
-        if (note.updatedAt) setDate(new Date(note.updatedAt));
+        if (note.updated_at) setDate(new Date(note.updated_at));
         setValue("title", note.title);
         setValue("body", note.body);
         setValue("tag", note.tag);

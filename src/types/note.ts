@@ -3,6 +3,6 @@ export default interface Note {
   title: string;
   body: string;
   tag: string;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  created_at?: string | Date;
+  updated_at?: string | Date;
 }

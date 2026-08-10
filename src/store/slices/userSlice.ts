@@ -3,6 +3,7 @@ import type { AppDispatch } from "../store";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { getNotes } from "./noteSlice";
+import { addErrorMsg } from "./msgSlice";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 // const SERVER_URL = "http://localhost:5000";
@@ -20,17 +21,17 @@ export const signupUser = createAsyncThunk(
   "signupUser",
   async ({ username, email, password, dispatch }: SignupUserRequest) => {
     try {
-      const response = await axios.post(constructApiUrl(""), {
+      const response = await axios.post(constructApiUrl("register"), {
         username,
         email,
         password,
       });
 
       if (response.status == 201) {
-        dispatch(getNotes(response.data.authtoken));
+        dispatch(getNotes(response.data.data.authtoken));
       }
       return {
-        data: response.data,
+        data: response.data.data,
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -49,7 +50,7 @@ export const signupUser = createAsyncThunk(
         };
       }
     }
-  }
+  },
 );
 
 interface LoginUserRequest {
@@ -67,10 +68,10 @@ export const loginUser = createAsyncThunk(
         password,
       });
       if (response.status === 200) {
-        dispatch(getNotes(response.data.authtoken));
+        dispatch(getNotes(response.data.data.authtoken));
       }
       return {
-        data: response.data,
+        data: response.data.data,
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -89,7 +90,7 @@ export const loginUser = createAsyncThunk(
         };
       }
     }
-  }
+  },
 );
 
 interface GetUserRequest {
@@ -102,19 +103,18 @@ export const getUser = createAsyncThunk(
   async ({ token, dispatch }: GetUserRequest) => {
     try {
       const response = await axios.get(constructApiUrl(""), {
-        headers: {
-          "auth-token": token,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.status === 200) {
         dispatch(getNotes(token));
       }
       return {
-        data: response.data,
+        data: response.data.data,
       };
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        dispatch(addErrorMsg("Please Login First"));
         if (error.response) {
           return {
             error: error.response.data.error,
@@ -130,7 +130,7 @@ export const getUser = createAsyncThunk(
         };
       }
     }
-  }
+  },
 );
 
 interface userState {
@@ -178,6 +178,7 @@ const userSlice = createSlice({
       state.isPending = true;
     });
     builder.addCase(loginUser.fulfilled, (state, action) => {
+      console.log("data:", action.payload);
       if (action.payload.data) {
         state.isLogin = true;
         state.username = action.payload.data.username;
@@ -214,6 +215,7 @@ const userSlice = createSlice({
         state.isLogin = true;
         state.username = action.payload.data.username;
         state.email = action.payload.data.email;
+        state.authtoken = action.payload.data.authtoken;
       }
     });
     builder.addCase(getUser.rejected, (state) => {

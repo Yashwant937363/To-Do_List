@@ -16,7 +16,6 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (!isLogin) {
       navigate("/auth/login");
-      dispatch(addErrorMsg("Please Login First"));
     }
   }, []);
   return (
@@ -30,7 +29,7 @@ const Home: React.FC = () => {
           className="bg-primary hover:bg-primary/90  py-1 px-2 rounded-lg flex space-x-2  cursor-pointer"
         >
           create note
-          <Plus className="w-[20px]" />
+          <Plus className="w-5" />
         </motion.button>
       </div>
       <NotesContainer />
